@@ -1,0 +1,1625 @@
+#include"stdio.h"
+#include"stdlib.h"
+#include"string.h"
+#include "time.h"
+
+
+
+void start();
+//void EnglishSignUp();
+//void EnglishSignIn();
+void CE_Add_Account_Number();
+
+void ChineseSignUp();//中文注册
+void CESetAccount();//中英文设置账户号码
+void CESetPassword();//中英文设置密码
+
+
+void ChineseSignIn();//中文登录 
+void InitialPassword();//初始化密码函数
+void homePage();//中文菜单页
+void EnglishhomePage();
+void loadData();//初始化
+void TradeloadData();
+void saveData();//保存数据
+void time();//系统时间
+
+void DepositMoney();//存款业务
+void WithdrawMoney();//取款业务
+void TransferMoney();//转账业务
+void RecordDeposit();//存款流水
+void RecordWithdraw();//取款流水
+void RecordTransfer();//转账流水
+void saveRecordData();//保存流水记录
+
+
+
+void Enquiry();//查询业务
+void EnquiryBalance();//查询余额
+void EnquiryInformation();//查询个人信息
+void EnquiryRecord();//查询流水记录
+void PrintRecord();//打印流水
+
+
+void ChangeInformation();//修改信息选项页
+void ChangeUser();//修改用户名称
+void ChangeAccountNum();//修改账户
+void Changephone();//修改联系电话
+void ChangePassword();//修改密码
+
+void CECloseAccount();//注销账户
+void CECloseAccount1();
+
+
+
+int n;
+int Bank;
+int Random_Number;//随机数
+char str[50];
+int AccountNum1 = 1000;
+int AccountNum2 = 2000;
+int AccountNum3 = 3000;
+
+
+
+
+
+//用户信息
+struct Account
+{
+	//char bank[100];//银行
+	char name[100];//用户名称
+	char account_number[50];//账户账号
+	char phone_number[12];//电话号码
+	char password[10];//密码
+	float balance;//余额
+
+	struct Account* next;
+};
+
+//交易信息
+struct Trade
+{
+	char Taccount_number[50];//账户账号
+	char Time[100];//时间
+	char Operation[100];//操作类型
+	char TarUse[50];//目标账户账号
+	float Money;//操作金额
+
+	struct Trade* Tnext;
+};
+
+typedef struct Account Account;
+typedef struct Trade Trade;
+
+Account* Pset = (Account*)malloc(sizeof(Account));
+Account* head = NULL;
+Account* tail = NULL;
+Account* curAccount;
+Account* curAccountO;
+Account* curAccount1;
+Account* curAccount2;
+Account* curAccount3;
+Account IV;
+
+
+
+
+Trade* Thead = NULL;
+Trade* Ttail = NULL;
+Trade* TcurAccount;
+Trade TA;
+char tmp1[100];
+
+
+
+
+
+void time()
+{
+	time_t t = time(0);
+	Random_Number = time(0) % 4 + 1;
+	char tmp[20];
+	strftime(tmp, sizeof(tmp), "%Y/%m/%d/%X", localtime(&t));
+	strftime(tmp1, sizeof(tmp), "%Y年%m月%d日", localtime(&t));
+	strcpy(TA.Time, tmp);
+}
+
+
+
+
+//查找当前账户
+int findAccount(Account IV1)//登录时查找当前账户
+{
+	Account* curP = head;
+	Trade* TcurP = Thead;
+	while (curP != NULL)
+	{
+		if (strcmp(curP->account_number, IV1.account_number) == 0)
+		{
+			curAccount = curP;//当前账户curAccount
+			return 1;
+		}
+		curP = curP->next;
+	}
+	return 0;
+}
+
+//验证当前账户密码
+int findPassword(Account IV1)//登录时查找当前账户密码
+{
+	Account* curP = head;
+	while (curP != NULL)
+	{
+		if (strcmp(curP->password, IV1.password) == 0)
+		{
+			curAccount = curP;
+			return 1;
+		}
+		curP = curP->next;
+	}
+	return 0;
+}
+
+
+
+
+//查找是否被已有账户
+int findAccount2(Account IV)
+{
+	Account* curP = head;
+	while (curP != NULL)
+	{
+		if (strcmp(curP->account_number, IV.account_number) == 0)
+		{
+			return 1;
+		}
+		curP = curP->next;
+	}
+	return 0;
+}
+
+
+//查找转账对象
+int findAccount3(Account TT)
+{
+	Account* curP = head;
+	while (curP != NULL)
+	{
+		if (strcmp(curAccount->account_number, TT.account_number) == 0)
+		{
+			int b, k = 0;
+			printf("\n不能给自己转账！！！\n");
+			while (k < 3)
+			{
+				printf("\n\n\t\t【1】重新输入对方账户号码\n\n\n\t\t【2】返回主页\n\n\n\t\t【0】退出系统\n");
+				scanf("%d", &b);
+				switch (b)
+				{
+				case 1:
+					system("cls");
+					TransferMoney();
+					k = 3;
+					break;
+				case 2:
+					system("cls");
+					homePage();
+					k = 3;
+					break;
+				case 0:
+					k = 3;
+					saveData();
+					exit(0);
+				default:
+					k++;
+					break;
+				}
+			}
+		}
+		else if (strcmp(curP->account_number, TT.account_number) == 0)
+		{
+			curAccountO = curP;//当前转账对象账户
+			return 1;
+		}
+		curP = curP->next;
+	}
+	return 0;
+}
+
+//打印流水
+void PrintRecord()
+{
+	int k = 0, w = 0;
+	Trade* TcurP = Thead;
+	printf("\n序号\t时间：\t\t\t\t交易类型：\t\t交易金额：\t\t交易账户：\n\n");//
+	while (TcurP != NULL)//交易记录
+	{
+		if (strcmp(curAccount->account_number, TcurP->Taccount_number) == 0)
+		{
+			w++;
+			TcurAccount = TcurP;
+			if (TcurAccount->Money < 0)
+			{
+				printf("\n<%d>\t%s\t\t%s\t\t%.2f\t\t%s\n", w, TcurAccount->Time, TcurAccount->Operation, TcurAccount->Money, TcurAccount->TarUse);
+			}
+			else
+			{
+				printf("\n<%d>\t%s\t\t%s\t\t+%.2f\t\t%s\n", w, TcurAccount->Time, TcurAccount->Operation, TcurAccount->Money, TcurAccount->TarUse);
+			}
+			k++;
+		}
+		TcurP = TcurP->Tnext;
+	}
+	if (k == 0)
+	{
+		printf("\n\t暂=无=交=易=记=录\n\t\t\n\n");
+	}
+}
+
+//初始化密码
+void InitialPassword()
+{
+	strcpy(curAccount->password, "000000");
+}
+
+
+
+
+//存款业务
+void DepositMoney()
+{
+	int a;
+	printf("\n【存款】\n========================================\n\n\t【温馨提示】1.金额须为100的整数。\n\n\t\t2.单笔存款不得超过10000。\n\n\n\t>>请输入你要存入的金额：\n");
+	scanf("%d", &a);
+	if (a % 100 || a > 10000)
+	{
+		int k = 0, b;
+		if (a > 10000)
+		{
+			printf("单笔存款不得超过10000。\n\n");
+		}
+		else
+			printf("金额须为100的整数。\n\n");
+		while (k < 3)
+		{
+			printf("\n\n\t\t【1】重新输入数额\n\n\n\t\t【2】返回主页\n\n\n\t\t【0】退出系统\n");
+			scanf("%d", &b);
+			switch (b)
+			{
+			case 1:
+				system("cls");
+				DepositMoney();
+				k = 3;
+				break;
+			case 2:
+				system("cls");
+				homePage();
+				k = 3;
+				break;
+			case 0:
+				k = 3;
+				saveData();
+				exit(0);
+			default:
+				k++;
+				break;
+			}
+		}
+	}
+	else
+	{
+		time();
+		TA.Money = a * 1.00;
+		curAccount->balance = curAccount->balance + TA.Money;
+		printf("\n您本次已成功存入%.2f!!!!\n", TA.Money);
+		RecordDeposit();
+		int k = 0, b;
+		while (k < 3)
+		{
+			printf("\n\n\t\t【1】再存一笔\n\n\n\t\t【2】返回主页\n\n\n\t\t【0】退出系统\n");
+			scanf("%d", &b);
+			switch (b)
+			{
+			case 1:
+				system("cls");
+				DepositMoney();
+				k = 3;
+				break;
+			case 2:
+				system("cls");
+				homePage();
+				k = 3;
+				break;
+			case 0:
+				k = 3;
+				saveData();
+				exit(0);
+			default:
+				k++;
+				break;
+			}
+		}
+	}
+}
+
+//存款流水记录
+void RecordDeposit()
+{
+	Trade* TP = (Trade*)malloc(sizeof(Trade));
+	TP->Tnext = NULL;
+	if (Thead == NULL)
+	{
+		Thead = TP;
+		Ttail = TP;
+	}
+	else
+	{
+		Ttail->Tnext = TP;
+		Ttail = TP;//我滴天哪
+		strcpy(TP->Taccount_number, curAccount->account_number);
+		strcpy(TP->Time, TA.Time);
+		strcpy(TP->Operation, "B存款/收入");
+		TP->Money = TA.Money;
+		strcpy(TP->TarUse, "本账户");
+		saveRecordData();
+	}
+}
+
+
+
+//取款业务
+void WithdrawMoney()
+{
+	int a;
+	printf("\n【取款】\n========================================\n\n\t【温馨提示】1.金额须为100的整数。\n\n\t\t2.单笔取款不得超过10000。\n\n\n\t>>请输入你要取出的金额：\n");
+	scanf("%d", &a);
+	if (a % 100 || a > 10000)
+	{
+		int k = 0, b;
+		if (a > 10000)
+		{
+			printf("单笔取款不得超过10000元。\n\n");
+		}
+		else
+			printf("金额须为100的整数。\n\n");
+		while (k < 3)
+		{
+			printf("\n\n\t\t【1】重新输入数额\n\n\n\t\t【2】返回主页\n\n\n\t\t【0】退出系统\n");
+			scanf("%d", &b);
+			switch (b)
+			{
+			case 1:
+				system("cls");
+				WithdrawMoney();
+				k = 3;
+				break;
+			case 2:
+				system("cls");
+				homePage();
+				k = 3;
+				break;
+			case 0:
+				k = 3;
+				saveData();
+				exit(0);
+			default:
+				k++;
+				break;
+			}
+		}
+	}
+	else
+	{
+		time();
+		//strcpy(TA.Operation, "A取款");
+		TA.Money = a * -1.00;
+		if (curAccount->balance + TA.Money < 0)
+		{
+			int k = 0, b;
+			printf("\n余额不足!!!!\n");
+			while (k < 3)
+			{
+				printf("\n\n\t\t【1】重新输入金额\n\n\n\t\t【2】返回主页\n\n\n\t\t【0】退出系统\n");
+				scanf("%d", &b);
+				switch (b)
+				{
+				case 1:
+					system("cls");
+					WithdrawMoney();
+					k = 3;
+					break;
+				case 2:
+					system("cls");
+					homePage();
+					k = 3;
+					break;
+				case 0:
+					k = 3;
+					saveData();
+					exit(0);
+				default:
+					k++;
+					break;
+				}
+			}
+		}
+		else
+		{
+			curAccount->balance = curAccount->balance + TA.Money;
+			printf("\n取款成功!!!!\n");
+			RecordWithdraw();
+			int k = 0, b;
+			while (k < 3)
+			{
+				printf("\n\n\t\t【1】再次取款\n\n\n\t\t【2】返回主页\n\n\n\t\t【0】退出系统\n");
+				scanf("%d", &b);
+				switch (b)
+				{
+				case 1:
+					system("cls");
+					WithdrawMoney();
+					k = 3;
+					break;
+				case 2:
+					system("cls");
+					homePage();
+					k = 3;
+					break;
+				case 0:
+					k = 3;
+					saveData();
+					exit(0);
+				default:
+					k++;
+					break;
+				}
+			}
+		}
+	}
+}
+
+//取款流水记录
+void  RecordWithdraw()
+{
+	Trade* TP = (Trade*)malloc(sizeof(Trade));
+	TP->Tnext = NULL;
+	if (Thead == NULL)
+	{
+		Thead = TP;
+		Ttail = TP;
+	}
+	else
+	{
+		Ttail->Tnext = TP;
+		Ttail = TP;//我滴天哪
+		strcpy(TP->Taccount_number, curAccount->account_number);
+		strcpy(TP->Time, TA.Time);
+		strcpy(TP->Operation, "A取款/支出");
+		TP->Money = TA.Money;
+		strcpy(TP->TarUse, "本账户");
+		saveRecordData();
+	}
+}
+
+
+
+
+//转账业务
+void TransferMoney()
+{
+	int a = 100;
+	printf("\n【转账】\n========================================\n\n\t【温馨提示】1.单笔转账不得超过10000元。\n\n\t\t2.汇款短信莫当真，陌生电话要谨慎。\n\t\t  遇到陷阱知深浅，正心律己要实诚。\n\n\n\t>>请输入你要转出到的账户：\n");
+	Account TT;//目标账户
+	scanf("%s", &TT.account_number);
+	if (findAccount3(TT))
+	{
+		printf(">>请输入你要转出的金额：\n");
+		scanf("%d", &a);
+		if (a > 10000)
+		{
+			printf("\n\t单笔转账不得超过10000元\n\t\t\n\n");
+			TransferMoney();
+		}
+		time();
+		//strcpy(TA.Operation, "B转账");
+		TA.Money = a * -1.00;
+		if (curAccount->balance + TA.Money < 0)
+		{
+			int k = 0, b;
+			printf("\n余额不足!!!!\n");
+			while (k < 3)
+			{
+				printf("\n\n\t\t【1】重新输入金额\n\n\n\t\t【2】返回主页\n\n\n\t\t【0】退出系统\n");
+				scanf("%d", &b);
+				switch (b)
+				{
+				case 1:
+					system("cls");
+					TransferMoney();
+					k = 3;
+					break;
+				case 2:
+					system("cls");
+					homePage();
+					k = 3;
+					break;
+				case 0:
+					k = 3;
+					saveData();
+					exit(0);
+				default:
+					k++;
+					break;
+				}
+			}
+		}
+		else
+		{
+			printf("\n转款成功!!!!\n");
+			curAccount->balance = curAccount->balance + TA.Money;//当前账户减去转账金额
+			curAccountO->balance = curAccountO->balance - TA.Money;//对方账户加上转账金额
+			RecordTransfer();
+			int k = 0, b;
+			while (k < 3)
+			{
+				printf("\n\n\t\t【1】再次转款\n\n\n\t\t【2】返回主页\n\n\n\t\t【0】退出系统\n");
+				scanf("%d", &b);
+				switch (b)
+				{
+				case 1:
+					system("cls");
+					TransferMoney();
+					k = 3;
+					break;
+				case 2:
+					system("cls");
+					homePage();
+					k = 3;
+					break;
+				case 0:
+					k = 3;
+					saveData();
+					exit(0);
+				default:
+					k++;
+					break;
+				}
+			}
+		}
+	}
+	else
+	{
+		int b, k = 0;
+		printf("\n对方账户不存在！！！！");
+		while (k < 3)
+		{
+			printf("\n\n\t\t【1】重新输入对方账号\n\n\n\t\t【2】返回主页\n\n\n\t\t【0】退出系统\n");
+			scanf("%d", &b);
+			switch (b)
+			{
+			case 1:
+				system("cls");
+				TransferMoney();
+				k = 3;
+				break;
+			case 2:
+				system("cls");
+				homePage();
+				k = 3;
+				break;
+			case 0:
+				k = 3;
+				saveData();
+				exit(0);
+			default:
+				k++;
+				break;
+			}
+		}
+	}
+}
+
+
+
+//转账转出流水记录
+void  RecordTransfer()
+{
+	Trade* TP = (Trade*)malloc(sizeof(Trade));
+	TP->Tnext = NULL;
+	if (Thead == NULL)
+	{
+		Thead = TP;
+		Ttail = TP;
+	}
+	else
+	{
+		Ttail->Tnext = TP;
+		Ttail = TP;//我滴天哪
+		strcpy(TP->Taccount_number, curAccount->account_number);
+		strcpy(TP->Time, TA.Time);
+		strcpy(TP->Operation, "A转账/支出");
+		strcpy(TP->TarUse, curAccountO->account_number);
+		TP->Money = TA.Money;
+		saveRecordData();
+	}
+
+
+	//转账转入流水记录
+
+	Trade* TPi = (Trade*)malloc(sizeof(Trade));//定义交易结构体 变量 转入TPi
+	TPi->Tnext = NULL;
+	if (Thead == NULL)
+	{
+		Thead = TPi;
+		Ttail = TPi;
+	}
+	else
+	{
+		Ttail->Tnext = TPi;
+		Ttail = TPi;//我滴天哪
+		strcpy(TPi->Taccount_number, curAccountO->account_number);//当前转入账号赋值给TPi
+		strcpy(TPi->Time, TA.Time);//当前时间赋值给TPi
+		strcpy(TPi->Operation, "B转账/收入");//当前操作类型赋值给TPi
+		strcpy(TPi->TarUse, curAccount->account_number);//当前转出账号赋值给TPi
+		TPi->Money = -TA.Money;//当前交易金额赋值给TPi
+		saveRecordData();
+	}
+}
+
+
+
+//查询业务页
+void Enquiry()
+{
+
+	int a, k = 0;
+	while (k < 3)
+	{
+		printf("\n【查询】\n========================================\n");
+		printf("\n\n\t\t【1】账户余额查询\n");
+		printf("\n\n\t\t【2】个人信息查询\n");
+		printf("\n\n\t\t【3】交易记录查询\n");
+		printf("\n\n\t\t【4】返回主页\n");
+		printf("\n\n\t\t【0】退出系统\n");
+		scanf("%d", &a);
+		switch (a)
+		{
+		case 1:
+			system("cls");
+			EnquiryBalance();
+			k = 3;
+			break;
+		case 2:
+			system("cls");
+			EnquiryInformation();
+			k = 3;
+			break;
+		case 3:
+			system("cls");
+			EnquiryRecord();
+			k = 3;
+			break;
+		case 4:
+			system("cls");
+			homePage();
+			k = 3;
+			break;
+		case 0:
+			system("cls");
+			k = 3;
+			saveData();
+			exit(0);
+		default:
+			k++;
+			break;
+		}
+	}
+}
+
+//账户余额查询
+void EnquiryBalance()
+{
+	printf("\n【账户余额查询】\n========================================\n");
+	time();
+	printf("\n\t您的余额为：\n\t\t%.2f\n", curAccount->balance);
+	printf("\n");
+	int a, k = 0;
+	while (k < 3)
+	{
+		printf("\n\n\t\t【1】返回上一页\n");
+		printf("\n\n\t\t【2】返回主页\n");
+		printf("\n\n\t\t【0】退出系统\n");
+		scanf("%d", &a);
+		switch (a)
+		{
+		case 1:
+			system("cls");
+			Enquiry();
+			k = 3;
+			break;
+		case 2:
+			system("cls");
+			homePage();
+			k = 3;
+			break;
+		case 0:
+			k = 3;
+			saveData();
+			exit(0);
+		default:
+			k++;
+			break;
+		}
+	}
+}
+
+//个人信息查询
+void EnquiryInformation()
+{
+	printf("\n【个人信息查询】\n========================================\n");
+	printf("\n\t姓名：\n\t\t%s\n", curAccount->name);
+	printf("\n\t账号：\n\t\t%s\n", curAccount->account_number);
+	printf("\n\t联系电话：\n\t\t%s\n\n", curAccount->phone_number);
+	int a, k = 0;
+	while (k < 3)
+	{
+		printf("\n\n\t\t【1】返回上一页\n");
+		printf("\n\n\t\t【2】返回主页\n");
+		printf("\n\n\t\t【0】退出系统\n");
+		scanf("%d", &a);
+		switch (a)
+		{
+		case 1:
+			system("cls");
+			Enquiry();
+			k = 3;
+			break;
+		case 2:
+			system("cls");
+			homePage();
+			k = 3;
+			break;
+		case 0:
+			k = 3;
+			saveData();
+			exit(0);
+		default:
+			k++;
+			break;
+		}
+	}
+}
+
+//交易记录查询
+void EnquiryRecord()
+{
+	printf("\n【交易记录查询】\t\t\t\t\t\t\t\t\t%s\n======================================================================================================\n", tmp1);
+	PrintRecord();
+	int a, k = 0;
+	while (k < 3)
+	{
+		printf("\n\n\t\t【1】返回上一页\n");
+		printf("\n\n\t\t【2】返回主页\n");
+		printf("\n\n\t\t【0】退出系统\n");
+		scanf("%d", &a);
+		switch (a)
+		{
+		case 1:
+			system("cls");
+			Enquiry();
+			k = 3;
+			break;
+		case 2:
+			system("cls");
+			homePage();
+			k = 3;
+			break;
+		case 0:
+			k = 3;
+			saveData();
+			exit(0);
+		default:
+			k++;
+			break;
+		}
+	}
+}
+
+//修改用户
+void ChangeUser()
+{
+	int a, k = 0;
+	char Password[100];
+	while (k < 3)
+	{
+		printf("\n【修改用户名称】\n========================================\n");
+		printf("\n\n\t>>请输入密码：\n");
+		scanf("%s", Password);
+		system("cls");
+		printf("\n【修改用户名称】\n========================================\n");
+		if (strcmp(Password, curAccount->password) == 0)
+		{
+			printf("\n\n\t>>请输入新用户名称:\n");
+			scanf("%s", curAccount->name);
+			printf("\n【修改用户名称】\n========================================\n");
+			printf("\n\n\t用户名称修改成功！\n");
+			saveData();
+			k = 3;
+
+			int k2 = 0;
+			while (k2 < 3)
+			{
+				printf("\n\n\t\t【1】返回上一页\n");
+				printf("\n\n\t\t【2】返回主页\n");
+				printf("\n\n\t\t【0】退出系统\n");
+				scanf("%d", &a);
+				switch (a)
+				{
+				case 1:
+					system("cls");
+					ChangeInformation();
+					k = 3;
+					break;
+				case 2:
+					system("cls");
+					homePage();
+					k = 3;
+					break;
+				case 0:
+					k = 3;
+					saveData();
+					exit(0);
+				default:
+					k++;
+					break;
+				}
+			}
+		}
+		else
+		{
+			k++;
+			printf("密码输入错误! \t%d\t请按照提示重新输入：\n", 3 - k);
+		}
+	}
+}
+
+//修改账户
+void ChangeAccountNum()
+{
+	system("cls");
+	int a, k = 0;
+	char Password[100];
+	while (k < 3)
+	{
+		printf("\n【修改账户号码】\n========================================\n");
+		printf("\n\n\t>>请输入密码：\n");
+		scanf("%s", Password);
+		system("cls");
+		printf("\n【修改账户号码】\n========================================\n");
+		if (strcmp(Password, curAccount->password) == 0)
+		{
+			printf("\n\n\t>>请输入新账户号码:\n");
+			scanf("%s", curAccount->account_number);
+			system("cls");
+			printf("\n【修改账户号码】\n========================================\n");
+			printf("\n\n\t账户号码修改成功！\n");
+			saveData();
+			k = 3;
+
+			int k2 = 0;
+			while (k2 < 3)
+			{
+				printf("\n\n\t\t【1】返回上一页\n");
+				printf("\n\n\t\t【2】返回主页\n");
+				printf("\n\n\t\t【0】退出系统\n");
+				scanf("%d", &a);
+				switch (a)
+				{
+				case 1:
+					system("cls");
+					ChangeInformation();
+					k2 = 3;
+					break;
+				case 2:
+					system("cls");
+					homePage();
+					k2 = 3;
+					break;
+				case 0:
+					k2 = 3;
+					saveData();
+					exit(0);
+				default:
+					k2++;
+					break;
+				}
+			}
+		}
+		else
+		{
+			k++;
+			printf("密码输入错误! \t%d\t请按照提示重新输入：\n", 3 - k);
+		}
+	}
+}
+
+
+//修改联系电话
+void Changephone()
+{
+	system("cls");
+	int a, k = 0;
+	char Password[100];
+	while (k < 3)
+	{
+		printf("\n【修改联系电话】\n========================================\n");
+		printf("\n\n\t>>请输入密码：\n");
+		scanf("%s", Password);
+		system("cls");
+		printf("\n【修改联系电话】\n========================================\n");
+		if (strcmp(Password, curAccount->password) == 0)
+		{
+			printf("\n\n\t>>请输入新联系电话号码:\n");
+			scanf("%s", curAccount->phone_number);
+			system("cls");
+			printf("\n【修改联系电话】\n========================================\n");
+			printf("\n\n\t联系电话修改成功！\n");
+			saveData();
+			k = 3;
+
+			int k2 = 0;
+			while (k2 < 3)
+			{
+				printf("\n\n\t\t【1】返回上一页\n");
+				printf("\n\n\t\t【2】返回主页\n");
+				printf("\n\n\t\t【0】退出系统\n");
+				scanf("%d", &a);
+				switch (a)
+				{
+				case 1:
+					system("cls");
+					ChangeInformation();
+					k2 = 3;
+					break;
+				case 2:
+					system("cls");
+					homePage();
+					k2 = 3;
+					break;
+				case 0:
+					k2 = 3;
+					saveData();
+					exit(0);
+				default:
+					k2++;
+					break;
+				}
+			}
+		}
+		else
+		{
+			k++;
+			printf("密码输入错误! \t%d\t请按照提示重新输入：\n", 3 - k);
+		}
+	}
+}
+
+
+//修改密码
+void ChangePassword()
+{
+	system("cls");
+	int a, k = 0;
+	char Password[100];
+	while (k < 3)
+	{
+		printf("\n【修改账户密码】\n========================================\n");
+		printf("\n\n\t>>请输入密码：\n");
+		scanf("%s", Password);
+		system("cls");
+		printf("\n【修改账户密码】\n========================================\n");
+		if (strcmp(Password, curAccount->password) == 0)
+		{
+			printf("\n\n\t>>请输入新密码:\n");
+			scanf("%s", curAccount->password);
+			system("cls");
+			printf("\n【修改账户密码】\n========================================\n");
+			printf("\n\n\t密码修改成功！\n");
+			saveData();
+			k = 3;
+
+			int k2 = 0;
+			while (k2 < 3)
+			{
+				printf("\n\n\t\t【1】返回上一页\n");
+				printf("\n\n\t\t【2】返回主页\n");
+				printf("\n\n\t\t【0】退出系统\n");
+				scanf("%d", &a);
+				switch (a)
+				{
+				case 1:
+					system("cls");
+					ChangeInformation();
+					k2 = 3;
+					break;
+				case 2:
+					system("cls");
+					homePage();
+					k2 = 3;
+					break;
+				case 0:
+					k2 = 3;
+					saveData();
+					exit(0);
+				default:
+					k2++;
+					break;
+				}
+			}
+		}
+		else
+		{
+			k++;
+			printf("\n\n\t密码输入错误! \t%d\t请按照提示重新输入：\n", 3 - k);
+		}
+	}
+}
+
+
+//修改信息选项页
+void ChangeInformation()
+{
+	system("cls");
+	int a, k2 = 1;
+	while (k2)
+	{
+		printf("\n【修改个人资料】\n========================================");
+		printf("\n\n\t\t【1】修改用户名称\n");
+		printf("\n\n\t\t【2】修改账户号码\n");
+		printf("\n\n\t\t【3】修改联系电话\n");
+		printf("\n\n\t\t【4】修改账户密码\n");
+		printf("\n\n\t\t【9】返回上一页\n");
+		printf("\n\n\t\t【0】退出系统\n");
+		scanf("%d", &a);
+
+		switch (a)
+		{
+		case 1:
+			ChangeUser();
+			k2 = 0;
+			break;
+		case 2:
+			ChangeAccountNum();
+			k2 = 0;
+			break;
+		case 3:
+			Changephone();
+			k2 = 0;
+			break;
+		case 4:
+			ChangePassword();
+			k2 = 0;
+			break;
+		case 9:
+			homePage();
+			k2 = 0;
+			break;
+		case 0:
+			saveData();
+			exit(0);
+		default:
+			system("cls");
+			printf("输入错误！\t请按照提示重新输入：\n");
+			break;
+		}
+	}
+}
+
+//中文菜单页
+void homePage()//
+{
+	int a, k1 = 1;
+	while (k1)
+	{
+		k1 = 0;
+		printf("\n\n\t\t【1】存款\n");
+		printf("\n\n\t\t【2】取款\n");
+		printf("\n\n\t\t【3】转帐\n");
+		printf("\n\n\t\t【4】查询\n");
+		printf("\n\n\t\t【5】修改个人资料\n");
+		printf("\n\n\t\t【6】注销账号\n");
+		printf("\n\n\t\t【0】退出系统\n");
+		scanf("%d", &a);
+		switch (a)
+		{
+		case 1:
+			system("cls");
+			DepositMoney();
+			break;
+		case 2:
+			system("cls");
+			WithdrawMoney();
+			break;
+		case 3:
+			system("cls");
+			TransferMoney();
+			break;
+		case 4:
+			system("cls");
+			Enquiry();
+			break;
+		case 5:
+			system("cls");
+			ChangeInformation();
+			break;
+		case 6:
+			system("cls");
+			CECloseAccount();
+			break;
+		case 0:
+			system("cls");
+			saveData();
+			exit(0);
+			break;
+		default:
+			system("cls");
+			printf("\n\n\t\t输入错误！\n");
+			k1 = 1;
+			break;
+		}
+	}
+}
+
+//中文登录
+void ChineseSignIn()
+{
+	system("cls");
+	int m = 0, n = 0;
+	while (m < 3)//3次输入错账号将退出系统
+	{
+		Account IV1;//账户中间变量1
+		printf("\n登录\n========================================");
+		printf("\n\n\n\t>>请输入账号：\n");
+		scanf("%s", IV1.account_number);
+		system("cls");
+		if (findAccount(IV1))
+		{
+			while (n < 3)//3次输入错密码将退出系统
+			{
+				printf("\n登录\n========================================");
+				printf("\n\n\n\t>>请输入密码：\n");
+				scanf("%s", IV1.password);
+				system("cls");
+
+				if (findPassword(IV1))
+				{
+					m = 3;
+					n = 3;
+					printf("\n====================登录成功====================\n");
+					homePage();
+					break;
+				}
+				else
+				{
+					m++;
+					n++;
+					if (n == 3)
+					{
+						printf("\n\n\t该账号已经被冻结，请联系后台找回。\n");
+						InitialPassword();
+						break;
+					}
+					else
+					{
+						printf("\n\n\t密码错误  %d次机会后账号将会被冻结\n", 3 - n);
+					}
+				}
+			}
+		}
+		else
+		{
+			m++;
+			printf("\n\n\t没有查找到该用户!  %d  请重新输入：\n", 3 - m);
+			if (m == 3)
+			{
+				printf("\n\n\t错误，已退出系统\n");
+				saveData();
+				exit(0);
+			}
+		}
+	}
+}
+
+
+
+void ChooseBank()
+{
+	int a, k = 1;
+	while (k)
+	{
+		k = 0;
+		printf("\n请选择你要注册账号的所属很行：\n\n");
+		printf("\n\n\t\t【1】一号很行\n");
+		printf("\n\n\t\t【2】二号很行\n");
+		printf("\n\n\t\t【3】三号很行\n");
+		printf("\n\n\t\t【4】成年人不想做选择，请随便来一个\n");
+		printf("\n\n\t\t【0】退出系统\n");
+		scanf("%d", &a);
+		switch (a)
+		{
+		case 1:
+			Bank = 1;
+			break;
+		case 2:
+			Bank = 2;
+			break;
+		case 3:
+			Bank = 3;
+			break;
+		case 4:
+			Bank = Random_Number;
+			break;
+		case 0:
+			system("cls");
+			saveData();
+			exit(0);
+			break;
+		default:
+			system("cls");
+			printf("\n\n\t\t输入错误！\n");
+			k = 1;
+			break;
+		}
+	}
+}
+
+//中文注册
+void ChineseSignUp()//中文注册函数
+{
+	int a, k = 0;
+	printf("\n===============欢迎注册===============\n\n");
+
+	ChooseBank();
+	Pset->next = NULL;//Account* Pset = (Account*)malloc(sizeof(Account));//已定义
+	if (head == NULL)
+	{
+		head = Pset;
+		tail = Pset;//如果这是第一个创建的结点，则将头 尾指针指向这个结点
+	}
+	else
+	{
+		tail->next = Pset; //如果不是第一个创建的结点，则将上一个结点的后继指针指向当前结点
+		printf("\n\t>>请输入你的姓名\n");
+		scanf("%s", Pset->name);
+		int Acc = 1;
+		CE_Add_Account_Number();
+		while (findAccount2(IV))
+		{
+			CE_Add_Account_Number();
+				
+		}
+		strcpy(Pset->account_number, IV.account_number);
+
+		printf("\n\t>>请输入你的电话号码【11位】\n");
+		scanf("%s", Pset->phone_number);
+		printf("\n\t>>请设置你的账户密码【6位】\n");
+		CESetPassword();//跳转到中英文设置密码函数
+		Pset->balance = 0;
+
+		saveData();
+		while (k < 3)
+		{
+			system("cls");
+			printf("\n\t\t注=册=成=功\n");
+			printf("\n\t>>你的账户号码为1000+%s\n", Pset->account_number);
+			printf("\n\n\t\t【1】返回登录\n");
+			printf("\n\n\t\t【0】退出系统\n");
+			scanf("%d", &a);
+			if (a == 1)
+			{
+				system("cls");
+				ChineseSignIn();
+				break;
+			}
+			else if (a == 0)
+			{
+				exit(0);
+			}
+			else
+			{
+				k++;
+				printf("\n密码输入错误! \t%d\t请按照提示重新输入：\n", 3 - k);
+			}
+		}
+	}
+}
+
+//增加账户账号
+void CE_Add_Account_Number()
+{
+	switch (Bank)
+	{
+	case 1:
+		AccountNum1++;
+		itoa(AccountNum1, IV.account_number, 10);
+		break;
+	case 2:
+		AccountNum2++;
+		itoa(AccountNum2, IV.account_number, 10);
+		break;
+	case 3:
+		AccountNum3++;
+		itoa(AccountNum3, IV.account_number, 10);
+		break;
+	}
+}
+
+
+
+//中英文设置密码
+void CESetPassword()
+{
+	scanf("%s", IV.password);
+	if (strlen(IV.password) == 6)
+	{
+		strcpy(Pset->password, IV.password);
+	}
+	else
+	{
+		system("cls");
+		printf("\n\t\t密码为六位，你的密码设置有误！\n");
+		printf("\n\t请重新开始注册：\n");
+		ChineseSignUp();
+	}
+}
+
+void CECloseAccount()
+{
+	printf("\n\n\t此界面为注销账户界面，是否继续注销该账户？\n\n\t【温馨提示】1.注销前请确认余额是否清0，如果账户余额未清0，账号将无法注销成功。\n\n\t\t2.如果继续注销账号将会被回收，届时您将无法再次登录该账号。");
+	int aaa, k1 = 1;
+	while (k1)
+	{
+		k1 = 0;
+		printf("\n\n\t\t【1】继续注销(Continue logging out)\n");
+		printf("\n\n\t\t【2】不了，返回主页(No,go back to the home page)\n");
+		printf("\n\n\t\t【0】退出系统(Exist system)\n");
+		scanf("%d", &aaa);
+		switch (aaa)
+		{
+		case 1:
+			system("cls");
+			CECloseAccount1();
+			break;
+		case 2:
+			system("cls");
+			homePage();
+			break;
+		case 0:
+			system("cls");
+			saveData();
+			exit(0);
+			break;
+		default:
+			system("cls");
+			printf("\n\n\t\t输入错误！(Input error!)\n");
+			k1 = 1;
+			break;
+		}
+	}
+}
+
+
+void CECloseAccount1()
+{
+	if (curAccount->balance != 0)
+	{
+		printf("\n\n\t\t注销失败：余额未清零。(Logout failed: the balance is not cleared.)\n");
+		int a, k1 = 1;
+		while (k1)
+		{
+			k1 = 0;
+			printf("\n\n\t\t【1】去转账(To transfer money)\n");
+			printf("\n\n\t\t【2】返回主页(Back to home page)\n");
+			printf("\n\n\t\t【0】退出系统(Exist system)\n");
+			scanf("%d", &a);
+			switch (a)
+			{
+			case 1:
+				system("cls");
+				TransferMoney();
+				break;
+			case 2:
+				system("cls");
+				homePage();
+				break;
+			case 0:
+				system("cls");
+				saveData();
+				exit(0);
+				break;
+			default:
+				system("cls");
+				printf("\n\n\t\t输入错误！(Input error! )\n");
+				k1 = 1;
+				break;
+			}
+		}
+	}
+	else
+	{
+		printf("\n\n\t\t注销成功，欢迎您下次光临。(Logout successful,welcome to visit next time.)\n");
+		strcpy(curAccount->name, "已被注销");
+		strcpy(curAccount->account_number, "已被注销");
+		strcpy(curAccount->phone_number, "已被注销");
+		strcpy(curAccount->password, "已被注销");
+		saveData();
+		//free(curAccount);
+		exit(0);
+	}
+
+}
+
+//用户信息初始化
+void loadData()
+{
+	FILE* fp = fopen("D:/atm.txt", "r");
+	if (fp != NULL)
+	{
+		while (!feof(fp))
+		{
+			Account* newNodeP = (Account*)malloc(sizeof(Account));
+			fscanf(fp, "%s\t%s\t%s\t%s\t%f\n", newNodeP->name, newNodeP->account_number, newNodeP->phone_number, newNodeP->password, &newNodeP->balance);
+			newNodeP->next = NULL;
+
+			if (head == NULL)
+			{
+				head = newNodeP;
+				tail = newNodeP;
+			}
+			else
+			{
+				tail->next = newNodeP;
+				tail = newNodeP;
+			}
+		}
+		fclose(fp);
+	}
+}
+
+
+
+
+
+//交易信息初始化
+void TradeloadData()
+{
+	FILE* Tfp = fopen("D:/atmtrade.txt", "r");
+	if (Tfp != NULL)
+	{
+		while (!feof(Tfp))
+		{
+			Trade* TnewNodeP = (Trade*)malloc(sizeof(Trade));
+			fscanf(Tfp, "%s\t%s\t%s\t%s\t%f\n", TnewNodeP->Taccount_number, TnewNodeP->Time, TnewNodeP->Operation, TnewNodeP->TarUse, &TnewNodeP->Money);
+			TnewNodeP->Tnext = NULL;
+
+			if (Thead == NULL)
+			{
+				Thead = TnewNodeP;
+				Ttail = TnewNodeP;
+			}
+			else
+			{
+				Ttail->Tnext = TnewNodeP;
+				Ttail = TnewNodeP;
+			}
+		}
+		fclose(Tfp);
+	}
+}
+
+
+
+
+
+
+//开始界面
+void start()
+{
+	int n1, k = 1;
+	while (k)
+	{
+		//system("cls");
+		printf("\n\n\t请选择语言：\t");
+		printf("Please choose language：\n");
+		printf("\n\n\t\t【1】中英混合文(Mixed Chinese and English)\n");
+		printf("\n\n\t\t【0】退出 (Exit)\n");
+		scanf("%d", &n);
+
+		switch (n)
+		{
+		case 1:
+			system("cls");
+			printf("\n\n\t\t【1】用户登录（user login）\n");
+			printf("\n\n\t\t【2】用户注册（user registration）\n");
+			printf("\n\n\t\t【其它】返回上一页(Back to the prexious page)\n");
+			scanf("%d", &n1);
+			k = 0;
+			if (n1 == 1)
+			{
+				system("cls");
+				ChineseSignIn();//中文注册函数
+			}
+			else if (n1 == 2)
+			{
+				system("cls");
+				ChineseSignUp();
+			}
+			else
+				k = 1;
+			break;
+		case 0:
+			saveData();
+			exit(0);
+		default:
+			k = 1;
+			printf("\n\n\t输入有误!请按照提示再次输入!(Wrong input! Please follow the prompts to enter again!)\t\t");
+			printf("Error,please follow the prompts to enter again!\n\n");
+			break;
+		}
+	}
+}
+
+
+//保存数据
+void saveData()
+{
+	FILE* fp = fopen("D:/atm.txt", "w");//保存用户数据
+	if (fp != NULL)
+	{
+		Account* curP = head;
+		while (curP != NULL)
+		{
+			fprintf(fp, "%s\t%s\t%s\t%s\t%f\n", curP->name, curP->account_number, curP->phone_number, curP->password, curP->balance);
+			curP = curP->next;
+		}
+		fclose(fp);
+	}
+}
+
+
+
+//保存流水数据
+void saveRecordData()
+{
+	FILE* Tfp = fopen("D:/atmtrade.txt", "at+");//保存交易数据
+	if (Tfp != NULL)
+	{
+		Trade* TcurP = Thead;
+		while (TcurP != NULL)
+		{
+			if (TcurP->Tnext == NULL)
+			{
+				fprintf(Tfp, "%s\t%s\t%s\t%s\t%f\n", TcurP->Taccount_number, TcurP->Time, TcurP->Operation, TcurP->TarUse, TcurP->Money);
+			}
+			TcurP = TcurP->Tnext;
+		}
+		fclose(Tfp);
+	}
+}
+
+
+
+
+
+int main()
+{
+	time();
+	loadData();
+	TradeloadData();
+	start();
+
+	//printLinkedList();
+	saveData();
+	saveRecordData();
+	return 0;
+}
